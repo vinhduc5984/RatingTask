@@ -169,8 +169,8 @@ func DeleteDoto() gin.HandlerFunc {
 			return
 		}
 
-		// delete RDB with key
-		configs.DeleteRDBByKey(ctx,[]string{"COUNT_REG"})
+		// // delete RDB with key
+		// configs.DeleteRDBByKey(ctx,[]string{"COUNT_REG"})
 
 		c.JSON(http.StatusOK,
 			responses.ToDoResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "ToDo successfully deleted!"}},
