@@ -1,0 +1,57 @@
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.out
+*.test
+
+# Output folders
+bin/
+build
+
+# Logs and cache
+*.log
+*.pprof
+
+# Dependency management
+vendor/
+
+# IDE/editor config
+.vscode/
+.idea/
+*.swp
+
+# Environment variables
+.env
+.env.*
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+
+
+
+node_modules
+dist
+package-lock.json
+yarn-error.log
+yarn.lock
+main
+main.exe
+go.sum
+go.mod
+mockdb
+/pt/
+doc
+saved_log
+workspace.code-workspace
+upload-config.json
+
