@@ -11,7 +11,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"suntech.com.vn/skylib/skylog.git/skylog"
+	// "suntech.com.vn/skylib/skylog.git/skylog"
 )
 
 var (
@@ -100,7 +100,7 @@ func DuplicatedError(field string) error {
 func CatchError() {
 	if err := recover(); err != nil {
 		e := stackerror.New("=======CatchError=======")
-		skylog.DetailError("CatchError has error: ", err)
+		// skylog.DetailError("CatchError has error: ", err)
 		fmt.Println(e.Error())
 	}
 }
@@ -108,7 +108,7 @@ func CatchError() {
 func TxCatchError(tx *sql.Tx) {
 	if err := recover(); err != nil {
 		e := stackerror.New("=======CatchError=======")
-		skylog.DetailError("CatchError has error: ", err)
+		// skylog.DetailError("CatchError has error: ", err)
 		fmt.Println(e.Error())
 		tx.Rollback()
 	} else {

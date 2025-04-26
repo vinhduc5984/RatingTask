@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc/metadata"
-	"suntech.com.vn/skylib/skylog.git/skylog"
+	// "suntech.com.vn/skylib/skylog.git/skylog"
 )
 
 const (
@@ -29,7 +29,7 @@ func BuildServiceUrl(urlOrServiceAddr, path string) (string, error) {
 
 	parts := strings.Split(urlOrServiceAddr, ":")
 	if len(parts) < 2 {
-		skylog.Errorf("service address is incorrect: %v", urlOrServiceAddr)
+		// skylog.Errorf("service address is incorrect: %v", urlOrServiceAddr)
 		return "", errors.New("service address is incorrect")
 	}
 	grpcPort, _ := strconv.Atoi(parts[1])
@@ -46,7 +46,7 @@ func SendRawFromRequest(method, urlOrServiceAddr, path, accessToken string, body
 	// build url
 	serviceUrl, err := BuildServiceUrl(urlOrServiceAddr, path)
 	if err != nil {
-		skylog.Errorf("SendRawFromRequest build service url error: %v", err)
+		// skylog.Errorf("SendRawFromRequest build service url error: %v", err)
 		return nil, err
 	}
 
@@ -55,7 +55,7 @@ func SendRawFromRequest(method, urlOrServiceAddr, path, accessToken string, body
 	if method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch {
 		bodyData, err := json.Marshal(body)
 		if err != nil {
-			skylog.Errorf("SendRawFromRequest create body data error: %v | data: %v", err, body)
+			// skylog.Errorf("SendRawFromRequest create body data error: %v | data: %v", err, body)
 			return nil, err
 		}
 		data = bytes.NewReader(bodyData)
@@ -63,7 +63,7 @@ func SendRawFromRequest(method, urlOrServiceAddr, path, accessToken string, body
 	// create request
 	req, err := http.NewRequest(method, serviceUrl, data)
 	if err != nil {
-		skylog.Errorf("SendRawFromRequest create request error: %v", err)
+		// skylog.Errorf("SendRawFromRequest create request error: %v", err)
 		return nil, err
 	}
 
@@ -140,14 +140,14 @@ func SendMultiPartForm(method, urlOrServiceAddr, path string, body io.Reader, co
 	// build url
 	serviceUrl, err := BuildServiceUrl(urlOrServiceAddr, path)
 	if err != nil {
-		skylog.Errorf("SendMultiPartForm build service url error: %v", err)
+		// skylog.Errorf("SendMultiPartForm build service url error: %v", err)
 		return nil, err
 	}
 
 	// create request
 	req, err := http.NewRequest(method, serviceUrl, body)
 	if err != nil {
-		skylog.Errorf("SendMultiPartForm create request error: %v", err)
+		// skylog.Errorf("SendMultiPartForm create request error: %v", err)
 		return nil, err
 	}
 
@@ -189,7 +189,7 @@ func ForwardRequest(method, urlOrServiceAddr, path, accessToken string, body map
 	// send request
 	resp, err := SendRawFromRequest(method, urlOrServiceAddr, path, accessToken, body, fromReqOrContext)
 	if err != nil {
-		skylog.Errorf("SendRequest send request error 1: %v", err)
+		// skylog.Errorf("SendRequest send request error 1: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -199,7 +199,7 @@ func ForwardRequest(method, urlOrServiceAddr, path, accessToken string, body map
 	if resp.StatusCode == http.StatusOK {
 		return resData, nil
 	}
-	skylog.Errorf("SendRequest send request error 2: %v", string(resData))
+	// skylog.Errorf("SendRequest send request error 2: %v", string(resData))
 	return resData, CallRESTAPIError
 }
 
@@ -233,7 +233,7 @@ func RestDownloadFile(urlOrServiceAddr, path string, ctx context.Context) ([]byt
 	// send request
 	resp, err := SendRawFromRequest(http.MethodGet, urlOrServiceAddr, path, accessToken, nil, ctx)
 	if err != nil {
-		skylog.Errorf("RestDownloadFile send request error: %v", err)
+		// skylog.Errorf("RestDownloadFile send request error: %v", err)
 		return nil, "", "", "", err
 	}
 	defer resp.Body.Close()
@@ -253,7 +253,7 @@ func RestDownloadFile(urlOrServiceAddr, path string, ctx context.Context) ([]byt
 		if dateStr != "" {
 			date, err := time.Parse(http.TimeFormat, dateStr)
 			if err != nil {
-				skylog.Errorf("RestDownloadFile parse time error; time=%v; err:%v", dateStr, err)
+				// skylog.Errorf("RestDownloadFile parse time error; time=%v; err:%v", dateStr, err)
 				dateStr = ""
 			} else {
 				dateStr = ToStr(date.UTC().UnixMilli())
@@ -263,17 +263,17 @@ func RestDownloadFile(urlOrServiceAddr, path string, ctx context.Context) ([]byt
 		// Read the response body into a byte array
 		bytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			skylog.Errorf("RestDownloadFile read body error: %v", err)
+			// skylog.Errorf("RestDownloadFile read body error: %v", err)
 			return nil, fileName, contentType, dateStr, err
 		}
 
 		return bytes, fileName, contentType, dateStr, nil
 	} else {
-		skylog.Errorf("RestDownloadFile call request error: %v", resp.StatusCode)
+		// skylog.Errorf("RestDownloadFile call request error: %v", resp.StatusCode)
 		// Read the response body into a byte array
 		bytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			skylog.Errorf("RestDownloadFile read body error: %v", err)
+			// skylog.Errorf("RestDownloadFile read body error: %v", err)
 			return nil, "", "", "", err
 		}
 
@@ -285,7 +285,7 @@ func RestUploadFile(urlOrServiceAddr, path string, body io.Reader, contentType s
 	// send request
 	resp, err := SendMultiPartForm(http.MethodPost, urlOrServiceAddr, path, body, contentType, ctx)
 	if err != nil {
-		skylog.Errorf("RestUploadFile send multi part file error: %v", err)
+		// skylog.Errorf("RestUploadFile send multi part file error: %v", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -294,7 +294,7 @@ func RestUploadFile(urlOrServiceAddr, path string, body io.Reader, contentType s
 	if resp.StatusCode == http.StatusOK {
 		return resData, nil
 	}
-	skylog.Errorf("RestUploadFile send multi part file error: %v", string(resData))
+	// skylog.Errorf("RestUploadFile send multi part file error: %v", string(resData))
 	return resData, CallRESTAPIError
 }
 
@@ -313,7 +313,7 @@ func IsValidChecksum(r *http.Request) bool {
 		if checksum == serverChecksum {
 			return true
 		}
-		skylog.Infof("IsValidChecksum: checksum = %v <> %v = serverChecksum (%v)", checksum, serverChecksum, checksumUrl)
+		// skylog.Infof("IsValidChecksum: checksum = %v <> %v = serverChecksum (%v)", checksum, serverChecksum, checksumUrl)
 	}
 	return false
 }
@@ -348,7 +348,7 @@ func IsValidChecksumWithUrl(urlStr string) bool {
 		if checksum == serverChecksum {
 			return true
 		}
-		skylog.Infof("IsValidChecksumWithUrl: client checksum = %v <> %v = serverChecksum (%v)", checksum, serverChecksum, checksumUrl)
+		// skylog.Infof("IsValidChecksumWithUrl: client checksum = %v <> %v = serverChecksum (%v)", checksum, serverChecksum, checksumUrl)
 	}
 	return false
 }

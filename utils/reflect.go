@@ -7,13 +7,13 @@ import (
 
 	"github.com/lingdor/stackerror"
 	"github.com/stoewer/go-strcase"
-	"suntech.com.vn/skylib/skylog.git/skylog"
+	// "suntech.com.vn/skylib/skylog.git/skylog"
 )
 
 func recoverSetReflectValue(structName, fieldName string, field reflect.Value, value interface{}) {
 	if r := recover(); r != nil {
 		fmt.Println("recovered from ", r)
-		skylog.Errorf("Field: %v of (%v) - Struct type: %v - DB type: %v", fieldName, structName, field.Type(), reflect.TypeOf(value))
+		// skylog.Errorf("Field: %v of (%v) - Struct type: %v - DB type: %v", fieldName, structName, field.Type(), reflect.TypeOf(value))
 		e := stackerror.New("=======stackerror=======")
 		fmt.Println(e.Error())
 	}
@@ -24,7 +24,7 @@ func SetReflectValue(structName, fieldName string, field reflect.Value, value in
 	defer recoverSetReflectValue(structName, fieldName, field, value)
 
 	if !field.IsValid() {
-		skylog.Infof("Field [%v] does not exist", field)
+		// skylog.Infof("Field [%v] does not exist", field)
 		return
 	}
 
@@ -67,7 +67,7 @@ func SetReflectValue(structName, fieldName string, field reflect.Value, value in
 // SetReflectField function
 func SetReflectField(st, field reflect.Value, fieldName string, value interface{}) {
 	if !field.IsValid() {
-		skylog.Infof("Field [%v] does not exist on struct [%v]", fieldName, st.Type().Name())
+		// skylog.Infof("Field [%v] does not exist on struct [%v]", fieldName, st.Type().Name())
 		return
 	}
 	SetReflectValue(GetStructNameFromValue(st), fieldName, field, value)
@@ -110,7 +110,7 @@ func ResetSliceOrStruct(source interface{}) {
 		v.Elem().Set(reflect.MakeSlice(v.Type().Elem(), 0, v.Elem().Cap()))
 	} else {
 		if reflect.ValueOf(source).Kind() != reflect.Ptr {
-			skylog.Error("Require a pointer parameter")
+			// skylog.Error("Require a pointer parameter")
 			return
 		}
 		p := reflect.ValueOf(source).Elem()
