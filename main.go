@@ -75,7 +75,7 @@ func main() {
 		log.Fatalf("Server forced to shutdown: %v\n", err)
 	}
 
-	log.Println("Server exiting")
+	log.Println("Server exiting xxx")
 }
 
 // getAlbums responds with the list of all albums as JSON.
