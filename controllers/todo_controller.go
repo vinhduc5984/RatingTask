@@ -10,6 +10,7 @@ import (
 	"todo-list/responses"
 
 	common "todo-list/common"
+	utils "todo-list/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -57,7 +58,7 @@ func CreateToDo() gin.HandlerFunc {
 				c.JSON(http.StatusBadRequest, responses.ToDoResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": mess}})
 				return
 			} else {
-				fmt.Println("Domain ổn.")
+				fmt.Println("Domain ok")
 			}
 
 		result, err := todoCollection.InsertOne(ctx, newToDo)
@@ -66,6 +67,21 @@ func CreateToDo() gin.HandlerFunc {
 			return
 		}
 
+		// get COUNT_REG redis
+		numCount := int32(0)
+		val, err := redisTest.Get(ctx,"COUNT_REG").Result()
+		if err != nil{
+			fmt.Println("get redis fail: ",err.Error())
+		}
+		if  val != ""{
+			numCount = utils.ConvertToInt32(val, 0)
+		}
+
+		// set number user register
+		err1 := redisTest.Set(ctx, "COUNT_REG", numCount + 1, 0).Err()
+		if err1!=nil{
+			fmt.Println("set redis fail: ", err1.Error())
+		}
 		c.JSON(http.StatusCreated, responses.ToDoResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
 	}
 }
@@ -77,9 +93,9 @@ func GetOneToDo() gin.HandlerFunc {
 		var user models.ToDo
 		defer cancel()
 
-		objId, _ := primitive.ObjectIDFromHex(todoId)
+		// objId, _ := primitive.ObjectIDFromHex(todoId)
 
-		err := todoCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&user)
+		err := todoCollection.FindOne(ctx, bson.M{"id": todoId}).Decode(&user)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ToDoResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
@@ -138,9 +154,9 @@ func DeleteDoto() gin.HandlerFunc {
 		todoId := c.Param("todoId")
 		defer cancel()
 
-		objId, _ := primitive.ObjectIDFromHex(todoId)
+		// objId, _ := primitive.ObjectIDFromHex(todoId)
 
-		result, err := todoCollection.DeleteOne(ctx, bson.M{"id": objId})
+		result, err := todoCollection.DeleteOne(ctx, bson.M{"id": todoId})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.ToDoResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
@@ -152,6 +168,9 @@ func DeleteDoto() gin.HandlerFunc {
 			)
 			return
 		}
+
+		// delete RDB with key
+		configs.DeleteRDBByKey(ctx,[]string{"COUNT_REG"})
 
 		c.JSON(http.StatusOK,
 			responses.ToDoResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": "ToDo successfully deleted!"}},
@@ -168,20 +187,13 @@ func GetAllToDos() gin.HandlerFunc {
 		var users []models.ToDo
 		defer cancel()
 
-		// set redis 
-		err := redisTest.Set(ctx,"Test-1","hi hi hi hahaha",0).Err()
-		if err!=nil{
-			fmt.Println("set redis fail: ",err.Error())
-			return
-		}
-
 		// get redis
-		val, err := redisTest.Get(ctx,"Test-1").Result()
+		val, err := redisTest.Get(ctx, "COUNT_REG").Result()
 		if err != nil{
 			fmt.Println("get redis fail: ",err.Error())
-			return
+			
 		}
-		fmt.Println("data redis::: ",val)
+		fmt.Println("data count redis::: ",val)
 
 		results, err := todoCollection.Find(ctx, bson.M{})
 

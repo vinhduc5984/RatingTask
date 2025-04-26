@@ -1,4 +1,4 @@
-package skyutl
+package utils
 
 //AddrOfInt64 function
 func AddrOfInt64(value int64) *int64 {

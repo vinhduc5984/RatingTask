@@ -1,9 +1,10 @@
-package skyutl
+package utils
 
 import (
-	"github.com/spf13/viper"
 	"net/http"
 	"regexp"
+
+	"github.com/spf13/viper"
 )
 
 func allowedOrigin(origin string) bool {

@@ -1,4 +1,4 @@
-package skyutl
+package utils
 
 import (
 	"database/sql"

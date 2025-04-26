@@ -1,4 +1,4 @@
-package skyutl
+package utils
 
 import (
 	"bytes"
@@ -12,6 +12,46 @@ import (
 var (
 	base58Chars = []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 )
+
+
+func ConvertToInt32(val any, defaultVal ...int32) int32 {
+	switch v := val.(type) {
+	case string:
+		val = strings.TrimSpace(v)
+	}
+
+	switch v := val.(type) {
+	case int:
+		return int32(v)
+	case int32:
+		return v
+	case int64:
+		return int32(v)
+	case float32:
+		return int32(v)
+	case float64:
+		return int32(v)
+	case string:
+		num, err := strconv.ParseInt(v, 10, 64)
+		if err == nil {
+			return int32(num)
+		} else {
+			if len(defaultVal) > 0 {
+				return defaultVal[0]
+			}
+			return 0
+		}
+	default:
+		num, err := strconv.ParseInt(ToStr(v), 10, 64)
+		if err == nil {
+			return int32(num)
+		}
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+		return 0
+	}
+}
 
 // ToInt64 convert interface{} to int64.
 func ToInt64(source interface{}) (int64, error) {
