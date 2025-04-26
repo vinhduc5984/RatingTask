@@ -46,8 +46,7 @@ yarn-error.log
 yarn.lock
 main
 main.exe
-go.sum
-go.mod
+
 mockdb
 /pt/
 doc
