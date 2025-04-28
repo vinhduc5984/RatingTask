@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"todo-list/configs"
 	"todo-list/routes"
@@ -49,11 +50,16 @@ func main() {
 	// All route
 	routes.ToDoRoute(router)
 
-	router.Run("localhost:6001")
+	// get PORT config
+	port := os.Getenv("PORT")
+	if port == ""{
+		port = "6001"
+	}
+	router.Run("0.0.0.0:" + port);
 
 	// Graceful shutdown
 	srv := &http.Server{
-		Addr:    ":6001",
+		Addr:    fmt.Sprintf(":%s",port),
 		Handler: router,
 	}
 	go func() {
