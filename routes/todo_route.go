@@ -7,10 +7,14 @@ import (
 )
 
 func ToDoRoute(router *gin.Engine) {
-	router.POST("/todo", controllers.CreateToDo())
-	router.GET("/get-one-ToDo/:todoId", controllers.GetOneToDo())
-	router.PUT("/update-ToDo/:todoId", controllers.EditToDo())
-	router.DELETE("/delete/:todoId", controllers.DeleteDoto())
-	router.GET("/get-all-todo", controllers.GetAllToDos())
-	router.POST("/upload", controllers.UploadFile())
+
+	api := router.Group("/todo")
+	{
+		api.POST("/create", controllers.CreateToDo())
+		api.GET("/get-one/:todoId", controllers.GetOneToDo())
+		api.PUT("/update/:todoId", controllers.EditToDo())
+		api.DELETE("/delete/:todoId", controllers.DeleteDoto())
+		api.GET("/get-all", controllers.GetAllToDos())
+		api.POST("/upload", controllers.UploadFile())
+	}
 }
