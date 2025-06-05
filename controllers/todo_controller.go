@@ -20,7 +20,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var todoCollection *mongo.Collection = configs.GetCollection(configs.DB, "todos")
+var todoCollection *mongo.Collection = configs.GetCollection(configs.DB, "todo")
 var validate = validator.New()
 
 var redisTest *redis.Client = configs.RDB
