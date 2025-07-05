@@ -23,3 +23,7 @@ type AccountLogin struct {
 	Username string `json:"username"  validate:"required"`
 	Password string `json:"password"  validate:"required"`
 }
+
+func (u *Account) HidePassWord() {
+	u.Password = ""
+}

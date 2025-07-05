@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	"todo-list/configs"
+	"todo-list/controllers/helper"
 	"todo-list/models"
 	"todo-list/responses"
 
@@ -86,6 +87,39 @@ func RegisterAccount() gin.HandlerFunc {
 			return
 		}
 
+		// insert default user when create account
+		objId, ok := result.InsertedID.(primitive.ObjectID)
+		if !ok {
+			c.JSON(http.StatusConflict, responses.AuthResponse{Status: 409, Message: "Lỗi", Data: nil})
+			return
+		}
+
+		if result.InsertedID != primitive.NilObjectID && result.InsertedID != "" {
+			var accountDB models.Account
+			err := accountCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&accountDB)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.ToDoResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				return
+			}
+			newUser := models.User{
+				Id:        primitive.NewObjectID(),
+				AccountId: accountDB.Id,
+				Role:      accountDB.Role,
+				DeletedBy: accountDB.DeletedBy,
+				DeletedAt: accountDB.DeletedAt,
+				UpdatedBy: accountDB.UpdatedBy,
+				UpdatedAt: accountDB.UpdatedAt,
+				CreatedBy: accountDB.CreatedBy,
+				CreatedAt: accountDB.CreatedAt,
+			}
+
+			_, err1 := userCollection.InsertOne(ctx, newUser)
+			if err1 != nil {
+				c.JSON(http.StatusConflict, responses.AuthResponse{Status: 409, Message: "Lỗi tạo user", Data: nil})
+				return
+			}
+		}
+
 		c.JSON(http.StatusCreated, responses.AuthResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
 	}
 }
@@ -109,6 +143,17 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
+		userId, _ := primitive.ObjectIDFromHex("60d5f483b3c2c66b28f4f123")
+		accountId, _ := primitive.ObjectIDFromHex("60d5f483b3c2c66b28f4f124")
+		text := models.User{Id: userId, AccountId: accountId, DeviceToken: "Device-123", Role: "ADMIN", Ip: "142.168.1.1"}
+
+		token, err1 := helper.GenerateToken(text)
+		if err1 != nil {
+			fmt.Println("loi roi: ", err1.Error())
+		}
+
+		fmt.Println("data token ne::: ", token)
+
 		err := accountCollection.FindOne(ctx, map[string]interface{}{"username": account.Username}).Decode(&accountDB)
 		if err != nil {
 			fmt.Println("login error: ", err.Error())
@@ -126,8 +171,9 @@ func Login() gin.HandlerFunc {
 			pKey := os.Getenv("ENDCODE_PASSWORD_KEY")
 			encodePassword := utils.EncodeSHA1Password(account.Password, pKey)
 			if accountDB.Password != "" && len(accountDB.Password) > 0 && subtle.ConstantTimeCompare([]byte(accountDB.Password), []byte(encodePassword)) == 1 {
+				accountDB.HidePassWord()
 				c.JSON(http.StatusOK, responses.AuthResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": accountDB}})
-
+				// handle create token here
 				return
 			}
 		}
